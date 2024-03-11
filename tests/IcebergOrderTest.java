@@ -57,16 +57,29 @@ public class IcebergOrderTest {
             .build();
 
     @ParameterizedTest
-    @MethodSource("dataProvider")
+    @MethodSource("predictionDataProvider")
     void generatePotentialResult(final IcebergOrder inputOrder, final TradePrediction inputPrediction, final IcebergOrder expectedResult) {
         final TradeResult actualResult = inputOrder.generatePotentialResult(inputPrediction);
 
         assertEquals(expectedResult, actualResult.getPredictedOrder());
     }
 
+    @ParameterizedTest
+    @MethodSource("quantityDataProvider")
+    void getAvailableQuantity(final IcebergOrder order, final int expectedResult) {
+        assertEquals(expectedResult, order.getAvailableQuantity());
+    }
 
+    private static Stream<Arguments> quantityDataProvider() {
+        return Stream.of(
+                Arguments.of(PASSIVE_ORDER, MAX_PEAK_SIZE),
+                Arguments.of(UNEVEN_PEAK_ORDER, MAX_PEAK_SIZE / 2),
+                Arguments.of(LAST_PEAK_ORDER, MAX_PEAK_SIZE / 2),
+                Arguments.of(AGGRESSIVE_ORDER, ORIGINAL_QUANTITY)
+        );
+    }
 
-    private static Stream<Arguments> dataProvider() {
+    private static Stream<Arguments> predictionDataProvider() {
         final TradePrediction partialPeakTrade = new TradePrediction(PRICE, MAX_PEAK_SIZE / 2, ORIGINAL_TIMESTAMP + 10);
         final TradePrediction fullPeakTrade = new TradePrediction(PRICE, MAX_PEAK_SIZE, ORIGINAL_TIMESTAMP + 25);
         final TradePrediction fullOrderTrade = new TradePrediction(PRICE, LAST_PEAK_ORDER.getMaxPeakSize(), ORIGINAL_TIMESTAMP + 15);

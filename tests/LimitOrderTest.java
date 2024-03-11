@@ -33,14 +33,27 @@ public class LimitOrderTest {
             .build();
 
     @ParameterizedTest
-    @MethodSource("dataProvider")
+    @MethodSource("predictionDataProvider")
     void generatePotentialResult(final LimitOrder inputOrder, final TradePrediction inputPrediction, final LimitOrder expectedResult) {
         final TradeResult actualResult = inputOrder.generatePotentialResult(inputPrediction);
 
         assertEquals(expectedResult, actualResult.getPredictedOrder());
     }
 
-    private static Stream<Arguments> dataProvider() {
+    @ParameterizedTest
+    @MethodSource("quantityDataProvider")
+    void getAvailableQuantity(final LimitOrder order, final int expectedResult) {
+        assertEquals(expectedResult, order.getAvailableQuantity());
+    }
+
+    private static Stream<Arguments> quantityDataProvider() {
+        return Stream.of(
+                Arguments.of(PASSIVE_ORDER, ORIGINAL_QUANTITY),
+                Arguments.of(AGGRESSIVE_ORDER, ORIGINAL_QUANTITY)
+        );
+    }
+
+    private static Stream<Arguments> predictionDataProvider() {
         final TradePrediction partialTrade = new TradePrediction(PRICE, ORIGINAL_QUANTITY / 2, ORIGINAL_TIMESTAMP + 10);
         final TradePrediction fullTrade = new TradePrediction(PRICE, ORIGINAL_QUANTITY, ORIGINAL_TIMESTAMP + 25);
 

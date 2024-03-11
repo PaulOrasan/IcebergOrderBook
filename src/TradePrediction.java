@@ -21,4 +21,8 @@ public class TradePrediction {
     public int getTimestamp() {
         return timestamp;
     }
+
+    public boolean isTradeMatch() {
+        return predictedQuantity > 0;
+    }
 }

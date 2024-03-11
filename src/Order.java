@@ -80,12 +80,12 @@ public abstract class Order {
 
     public static abstract class Builder<T extends Builder<T>> {
 
-        private int id;
-        private Side side;
-        private int price;
-        private int quantity;
-        private int timestamp;
-        private boolean isAggressive;
+        protected int id;
+        protected Side side;
+        protected int price;
+        protected int quantity;
+        protected int timestamp;
+        protected boolean isAggressive;
 
         public Builder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive) {
             this.id = id;

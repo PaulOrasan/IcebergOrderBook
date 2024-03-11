@@ -1,3 +1,7 @@
+
+
+import static java.lang.Math.min;
+
 import java.util.Objects;
 
 public class IcebergOrder extends Order{
@@ -10,7 +14,7 @@ public class IcebergOrder extends Order{
     }
 
     public IcebergOrder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive, int maxPeakSize) {
-        this(id, side, price, quantity, timestamp, isAggressive, maxPeakSize, isAggressive ? 0 : maxPeakSize);
+        this(id, side, price, quantity, timestamp, isAggressive, maxPeakSize, isAggressive ? 0 : min(quantity, maxPeakSize));
     }
 
     private IcebergOrder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive, int maxPeakSize, int currentPeakQuantity) {
@@ -35,12 +39,70 @@ public class IcebergOrder extends Order{
 
     @Override
     public int getAvailableQuantity() {
+        if (isAggressive()) {
+            return getQuantity();
+        }
         return getCurrentPeakQuantity();
     }
 
     @Override
     public TradeResult generatePotentialResult(TradePrediction prediction) {
-        return null;
+        if (isAggressive()) {
+            return generatePotentialResultForAggressiveOrder(prediction);
+        } else {
+            return generatePotentialResultForPassiveOrder(prediction);
+        }
+    }
+
+    private TradeResult generatePotentialResultForAggressiveOrder(TradePrediction prediction) {
+        if (!prediction.isTradeMatch()) {
+            final Order predictedOrder = builderFromOrder(this)
+                    .withAggressiveStatus(false)
+                    .withCurrentPeakQuantity(min(getMaxPeakSize(), getAvailableQuantity()))
+                    .build();
+            return new TradeResult(predictedOrder);
+        }
+        final Order predictedOrder = builderFromOrder(this)
+                .withQuantity(getAvailableQuantity() - prediction.getPredictedQuantity())
+                .build();
+        return new TradeResult(predictedOrder);
+    }
+
+    private TradeResult generatePotentialResultForPassiveOrder(TradePrediction prediction) {
+        if (!prediction.isTradeMatch()) {
+            return new TradeResult(builderFromOrder(this).build());
+        }
+        if (getAvailableQuantity() > prediction.getPredictedQuantity()) {
+            return generatePotentialResultForPartialPeakTrade(prediction);
+        }
+        if (getQuantity() > 0) {
+            return generatePotentialResultForFullPeakTrade(prediction);
+        }
+        return generatePotentialResultForFullOrderTrade(prediction);
+    }
+
+    private TradeResult generatePotentialResultForPartialPeakTrade(TradePrediction prediction) {
+        final IcebergOrder predictedOrder = builderFromOrder(this)
+                .withCurrentPeakQuantity(getAvailableQuantity() - prediction.getPredictedQuantity())
+                .build();
+        return new TradeResult(predictedOrder);
+    }
+
+    private TradeResult generatePotentialResultForFullPeakTrade(TradePrediction prediction) {
+        final IcebergOrder predictedOrder = builderFromOrder(this)
+                .withQuantity(getQuantity() - min(getQuantity(), getMaxPeakSize()))
+                .withCurrentPeakQuantity(min(getQuantity(), getMaxPeakSize()))
+                .withTimestamp(prediction.getTimestamp())
+                .build();
+        return new TradeResult(predictedOrder);
+    }
+
+    private TradeResult generatePotentialResultForFullOrderTrade(TradePrediction prediction) {
+        final IcebergOrder predictedOrder = builderFromOrder(this)
+                .withCurrentPeakQuantity(0)
+                .withTimestamp(prediction.getTimestamp())
+                .build();
+        return new TradeResult(predictedOrder);
     }
 
     @Override
@@ -86,7 +148,7 @@ public class IcebergOrder extends Order{
 
         public Builder withMaxPeakSize(int maxPeakSize) {
             this.maxPeakSize = maxPeakSize;
-            this.currentPeakQuantity = maxPeakSize;
+            this.currentPeakQuantity = isAggressive ? 0 : min(quantity, maxPeakSize);
             return getThis();
         }
 

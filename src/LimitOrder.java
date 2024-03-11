@@ -19,7 +19,16 @@ public class LimitOrder extends Order{
 
     @Override
     public TradeResult generatePotentialResult(TradePrediction prediction) {
-        return null;
+        final boolean predictedAggressiveStatus = isAggressive() && prediction.isTradeMatch();
+        final int predictedTimestamp = getAvailableQuantity() == prediction.getPredictedQuantity() ? prediction.getTimestamp() : getTimestamp();
+        final int predictedQuantity = getQuantity() - prediction.getPredictedQuantity();
+
+        final LimitOrder predictedOrder =  builderFromOrder(this)
+                .withAggressiveStatus(predictedAggressiveStatus)
+                .withQuantity(predictedQuantity)
+                .withTimestamp(predictedTimestamp)
+                .build();
+        return new TradeResult(predictedOrder);
     }
 
     public static Builder newBuilderInstance() {
