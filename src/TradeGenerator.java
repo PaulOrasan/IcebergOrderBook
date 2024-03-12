@@ -3,7 +3,7 @@ import static java.lang.Math.min;
 public class TradeGenerator {
 
 
-    private static final TradePrediction NO_TRADE = new TradePrediction(0, 0, 0);
+    private static final TradePrediction NO_TRADE = new TradePrediction(0, 0);
 
     public TradeGenerator() {}
 
@@ -14,6 +14,6 @@ public class TradeGenerator {
             return NO_TRADE;
         }
         final int tradedQuantity = min(aggressiveOrder.getAvailableQuantity(), passiveOrder.getAvailableQuantity());
-        return new TradePrediction(passiveOrder.getPrice(), tradedQuantity, aggressiveOrder.getTimestamp());
+        return new TradePrediction(passiveOrder.getPrice(), tradedQuantity);
     }
 }

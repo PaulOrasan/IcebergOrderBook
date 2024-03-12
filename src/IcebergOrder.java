@@ -134,6 +134,10 @@ public class IcebergOrder extends Order{
         return new Builder();
     }
 
+    public static Builder builderFromOrder(final Order order) {
+        return new Builder(order);
+    }
+
     public static Builder builderFromOrder(final IcebergOrder order) {
         return new Builder(order);
     }
@@ -142,6 +146,10 @@ public class IcebergOrder extends Order{
 
         private int maxPeakSize;
         private int currentPeakQuantity;
+
+        public Builder(final Order order) {
+            super(order.getId(), order.getSide(), order.getPrice(), order.getQuantity(), order.getTimestamp(), order.isAggressive());
+        }
 
         public Builder(final IcebergOrder order) {
             super(order.getId(), order.getSide(), order.getPrice(), order.getQuantity(), order.getTimestamp(), order.isAggressive());

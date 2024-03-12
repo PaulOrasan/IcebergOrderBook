@@ -72,7 +72,4 @@ public class OrderTestUtils {
                                                     int maxPeakQuantity) {
         return new IcebergOrder(id, side, price, quantity, timestamp, isAggressive, maxPeakQuantity);
     }
-
-
-
 }

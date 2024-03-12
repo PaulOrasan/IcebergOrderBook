@@ -8,7 +8,7 @@ public class OrderBookPriceLevel {
 
     public OrderBookPriceLevel(int price) {
         this.price = price;
-        this.orders = new PriorityQueue<>(Comparator.comparingInt(Order::getTimestamp));
+        this.orders = new PriorityQueue<>(Comparator.comparingLong(Order::getTimestamp));
     }
 
     public int getPrice() {

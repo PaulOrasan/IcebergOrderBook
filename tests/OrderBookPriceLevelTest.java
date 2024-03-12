@@ -24,7 +24,7 @@ public class OrderBookPriceLevelTest {
     }
 
     private void validateActualOrders(final List<Order> orders) {
-        final List<Integer> timestamps = orders.stream()
+        final List<Long> timestamps = orders.stream()
                 .map(Order::getTimestamp)
                 .collect(Collectors.toList());
         assertEquals(timestamps.stream()

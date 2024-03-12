@@ -80,11 +80,11 @@ public class IcebergOrderTest {
     }
 
     private static Stream<Arguments> predictionDataProvider() {
-        final TradePrediction partialPeakTrade = new TradePrediction(PRICE, MAX_PEAK_SIZE / 2, ORIGINAL_TIMESTAMP + 10);
-        final TradePrediction fullPeakTrade = new TradePrediction(PRICE, MAX_PEAK_SIZE, ORIGINAL_TIMESTAMP + 25);
-        final TradePrediction fullOrderTrade = new TradePrediction(PRICE, LAST_PEAK_ORDER.getMaxPeakSize(), ORIGINAL_TIMESTAMP + 15);
-        final TradePrediction aggressiveTrade = new TradePrediction(PRICE, 3 * MAX_PEAK_SIZE, ORIGINAL_TIMESTAMP + 12);
-        final TradePrediction noTrade = new TradePrediction(PRICE, 0, ORIGINAL_TIMESTAMP + 5);
+        final TradePrediction partialPeakTrade = new TradePrediction(PRICE, MAX_PEAK_SIZE / 2);
+        final TradePrediction fullPeakTrade = new TradePrediction(PRICE, MAX_PEAK_SIZE);
+        final TradePrediction fullOrderTrade = new TradePrediction(PRICE, LAST_PEAK_ORDER.getMaxPeakSize());
+        final TradePrediction aggressiveTrade = new TradePrediction(PRICE, 3 * MAX_PEAK_SIZE);
+        final TradePrediction noTrade = new TradePrediction(PRICE, 0);
 
 
         return Stream.of(
@@ -113,7 +113,7 @@ public class IcebergOrderTest {
         return (builder -> builder.withQuantity(targetQuantity));
     }
 
-    private static Consumer<IcebergOrder.Builder> timestampChangesTo(final int targetTimestamp) {
+    private static Consumer<IcebergOrder.Builder> timestampChangesTo(final long targetTimestamp) {
         return (builder -> builder.withTimestamp(targetTimestamp));
     }
 

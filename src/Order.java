@@ -6,7 +6,7 @@ public abstract class Order {
     private final Side side;
     private final int price;
     private final int quantity;
-    private final int timestamp;
+    private final long timestamp;
     private final boolean isAggressive;
 
     public Order(int id, Side side, int price, int quantity, int timestamp) {
@@ -47,7 +47,7 @@ public abstract class Order {
         return quantity;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
@@ -69,7 +69,7 @@ public abstract class Order {
         }
         Order order = (Order) o;
         return getId() == order.getId() && getPrice() == order.getPrice() && getQuantity() == order.getQuantity()
-                && getTimestamp() == order.getTimestamp() && isAggressive() == order.isAggressive() && getSide() == order.getSide()
+                && isAggressive() == order.isAggressive() && getSide() == order.getSide()
                 && getAvailableQuantity() == order.getAvailableQuantity();
     }
 
@@ -94,10 +94,10 @@ public abstract class Order {
         protected Side side;
         protected int price;
         protected int quantity;
-        protected int timestamp;
+        protected long timestamp;
         protected boolean isAggressive;
 
-        public Builder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive) {
+        public Builder(int id, Side side, int price, int quantity, long timestamp, boolean isAggressive) {
             this.id = id;
             this.side = side;
             this.price = price;
@@ -128,7 +128,7 @@ public abstract class Order {
             return getThis();
         }
 
-        public T withTimestamp(int timestamp) {
+        public T withTimestamp(long timestamp) {
             this.timestamp = timestamp;
             return getThis();
         }

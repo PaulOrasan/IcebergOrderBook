@@ -53,8 +53,8 @@ public class LimitOrderTest {
     }
 
     private static Stream<Arguments> predictionDataProvider() {
-        final TradePrediction partialTrade = new TradePrediction(PRICE, ORIGINAL_QUANTITY / 2, ORIGINAL_TIMESTAMP + 10);
-        final TradePrediction fullTrade = new TradePrediction(PRICE, ORIGINAL_QUANTITY, ORIGINAL_TIMESTAMP + 25);
+        final TradePrediction partialTrade = new TradePrediction(PRICE, ORIGINAL_QUANTITY / 2);
+        final TradePrediction fullTrade = new TradePrediction(PRICE, ORIGINAL_QUANTITY);
 
 
         return Stream.of(
@@ -78,7 +78,7 @@ public class LimitOrderTest {
         return (builder -> builder.withQuantity(targetQuantity));
     }
 
-    private static Consumer<LimitOrder.Builder> timestampChangesTo(final int targetTimestamp) {
+    private static Consumer<LimitOrder.Builder> timestampChangesTo(final long targetTimestamp) {
         return (builder -> builder.withTimestamp(targetTimestamp));
     }
 

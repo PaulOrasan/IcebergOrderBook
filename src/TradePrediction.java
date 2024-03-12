@@ -4,12 +4,12 @@ public class TradePrediction {
 
     private final int predictedPrice;
     private final int predictedQuantity;
-    private final int timestamp;
+    private final long timestamp;
 
-    public TradePrediction(int price, int quantity, int timestamp) {
+    public TradePrediction(int price, int quantity) {
         this.predictedPrice = price;
         this.predictedQuantity = quantity;
-        this.timestamp = timestamp;
+        this.timestamp = TimeUtils.getCurrentTimestamp();
     }
 
     public int getPredictedPrice() {
@@ -20,7 +20,7 @@ public class TradePrediction {
         return predictedQuantity;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
@@ -37,8 +37,7 @@ public class TradePrediction {
             return false;
         }
         TradePrediction that = (TradePrediction) o;
-        return getPredictedPrice() == that.getPredictedPrice() && getPredictedQuantity() == that.getPredictedQuantity()
-                && getTimestamp() == that.getTimestamp();
+        return getPredictedPrice() == that.getPredictedPrice() && getPredictedQuantity() == that.getPredictedQuantity();
     }
 
     @Override

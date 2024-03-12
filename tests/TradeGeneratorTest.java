@@ -36,11 +36,11 @@ public class TradeGeneratorTest {
     }
 
     private static Arguments scenarioNoTrade(final Order aggressiveOrder, Order passiveOrder) {
-        return scenario(aggressiveOrder, passiveOrder, new TradePrediction(0, 0, 0));
+        return scenario(aggressiveOrder, passiveOrder, new TradePrediction(0, 0));
     }
 
     private static Arguments scenario(Order aggressiveOrder, Order passiveOrder, int tradeQuantity) {
-        return scenario(aggressiveOrder, passiveOrder, new TradePrediction(passiveOrder.getPrice(), tradeQuantity, aggressiveOrder.getTimestamp()));
+        return scenario(aggressiveOrder, passiveOrder, new TradePrediction(passiveOrder.getPrice(), tradeQuantity));
     }
     private static Arguments scenario(final Order aggressiveOrder, Order passiveOrder, TradePrediction tradePrediction) {
         return Arguments.of(aggressiveOrder, passiveOrder, tradePrediction);

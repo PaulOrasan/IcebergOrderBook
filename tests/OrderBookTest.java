@@ -177,24 +177,24 @@ public class OrderBookTest {
                 new TradeResult(buySidePrediction), new TradeResult(sellSidePrediction));
     }
 
-    private static Order getExpectedBuyOrder(final List<Order> inputOrders) {
+    public static Order getExpectedBuyOrder(final List<Order> inputOrders) {
         return inputOrders.stream()
                 .filter(order -> Side.BUY.equals(order.getSide()))
                 .max((order1, order2) -> {
                     if (order1.getPrice() == order2.getPrice()) {
-                        return -Integer.compare(order1.getTimestamp(), order2.getTimestamp());
+                        return -Long.compare(order1.getTimestamp(), order2.getTimestamp());
                     }
                     return Integer.compare(order1.getPrice(), order2.getPrice());
                 })
                 .orElseThrow();
     }
 
-    private static Order getExpectedSellOrder(final List<Order> inputOrders) {
+    public static Order getExpectedSellOrder(final List<Order> inputOrders) {
         return inputOrders.stream()
                 .filter(order -> Side.SELL.equals(order.getSide()))
                 .max((order1, order2) -> {
                     if (order1.getPrice() == order2.getPrice()) {
-                        return -Integer.compare(order1.getTimestamp(), order2.getTimestamp());
+                        return -Long.compare(order1.getTimestamp(), order2.getTimestamp());
                     }
                     return -Integer.compare(order1.getPrice(), order2.getPrice());
                 })
