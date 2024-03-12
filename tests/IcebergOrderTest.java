@@ -9,14 +9,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class IcebergOrderTest {
 
-    private static final int ID = 12375;
-    private static final int PRICE = 89;
-    private static final int ORIGINAL_QUANTITY = 1000;
-    private static final int ORIGINAL_TIMESTAMP = 10000;
+    public static final int ORDER_ID = 12375;
+    public static final int PRICE = 89;
+    public static final int ORIGINAL_QUANTITY = 1000;
+    public static final int ORIGINAL_TIMESTAMP = 10000;
     private static final int MAX_PEAK_SIZE = 100;
 
     private static final IcebergOrder PASSIVE_ORDER = IcebergOrder.newBuilderInstance()
-            .withId(ID)
+            .withId(ORDER_ID)
             .withSide(Side.BUY)
             .withPrice(PRICE)
             .withQuantity(ORIGINAL_QUANTITY)
@@ -26,7 +26,7 @@ public class IcebergOrderTest {
             .build();
 
     private static final IcebergOrder UNEVEN_PEAK_ORDER = IcebergOrder.newBuilderInstance()
-            .withId(ID)
+            .withId(ORDER_ID)
             .withSide(Side.SELL)
             .withPrice(PRICE)
             .withQuantity(MAX_PEAK_SIZE / 2)
@@ -36,7 +36,7 @@ public class IcebergOrderTest {
             .build();
 
     private static final IcebergOrder LAST_PEAK_ORDER = IcebergOrder.newBuilderInstance()
-            .withId(ID)
+            .withId(ORDER_ID)
             .withSide(Side.SELL)
             .withPrice(PRICE)
             .withQuantity(0)
@@ -47,7 +47,7 @@ public class IcebergOrderTest {
             .build();
 
     private static final IcebergOrder AGGRESSIVE_ORDER = IcebergOrder.newBuilderInstance()
-            .withId(ID)
+            .withId(ORDER_ID)
             .withSide(Side.BUY)
             .withPrice(PRICE)
             .withQuantity(ORIGINAL_QUANTITY)
@@ -91,6 +91,7 @@ public class IcebergOrderTest {
                 scenario(PASSIVE_ORDER, partialPeakTrade, peakQuantityChangesTo(MAX_PEAK_SIZE / 2)),
                 scenario(PASSIVE_ORDER, fullPeakTrade, quantityChangesTo(ORIGINAL_QUANTITY - MAX_PEAK_SIZE), peakQuantityChangesTo(MAX_PEAK_SIZE),
                         timestampChangesTo(fullPeakTrade.getTimestamp())),
+                scenario(PASSIVE_ORDER, noTrade, nothingChanges()),
                 scenario(UNEVEN_PEAK_ORDER, fullPeakTrade, quantityChangesTo(0), peakQuantityChangesTo(UNEVEN_PEAK_ORDER.getQuantity()),
                         timestampChangesTo(fullPeakTrade.getTimestamp())),
                 scenario(LAST_PEAK_ORDER, fullOrderTrade, peakQuantityChangesTo(0), timestampChangesTo(fullOrderTrade.getTimestamp())),

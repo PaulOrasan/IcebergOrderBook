@@ -9,13 +9,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class LimitOrderTest {
 
-    private static final int ID = 12375;
-    private static final int PRICE = 89;
-    private static final int ORIGINAL_QUANTITY = 1000;
-    private static final int ORIGINAL_TIMESTAMP = 10000;
+    public static final int ORDER_ID = 12375;
+    public static final int PRICE = 89;
+    public static final int ORIGINAL_QUANTITY = 1000;
+    public static final int ORIGINAL_TIMESTAMP = 10000;
 
     private static final LimitOrder PASSIVE_ORDER = LimitOrder.newBuilderInstance()
-            .withId(ID)
+            .withId(ORDER_ID)
             .withSide(Side.BUY)
             .withPrice(PRICE)
             .withQuantity(ORIGINAL_QUANTITY)
@@ -24,7 +24,7 @@ public class LimitOrderTest {
             .build();
 
     private static final LimitOrder AGGRESSIVE_ORDER = LimitOrder.newBuilderInstance()
-            .withId(ID)
+            .withId(ORDER_ID)
             .withSide(Side.BUY)
             .withPrice(PRICE)
             .withQuantity(ORIGINAL_QUANTITY)
@@ -36,7 +36,6 @@ public class LimitOrderTest {
     @MethodSource("predictionDataProvider")
     void generatePotentialResult(final LimitOrder inputOrder, final TradePrediction inputPrediction, final LimitOrder expectedResult) {
         final TradeResult actualResult = inputOrder.generatePotentialResult(inputPrediction);
-
         assertEquals(expectedResult, actualResult.getPredictedOrder());
     }
 
