@@ -125,6 +125,11 @@ public class IcebergOrder extends Order{
         return Objects.hash(super.hashCode(), getMaxPeakSize(), getCurrentPeakQuantity());
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + "IcebergOrder{" + "maxPeakSize=" + maxPeakSize + ", currentPeakQuantity=" + currentPeakQuantity + '}';
+    }
+
     public static Builder newBuilderInstance() {
         return new Builder();
     }

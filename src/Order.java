@@ -55,6 +55,10 @@ public abstract class Order {
         return isAggressive;
     }
 
+    public boolean isBuyOrder() {
+        return Side.BUY.equals(getSide());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -72,6 +76,12 @@ public abstract class Order {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getSide(), getPrice(), getQuantity(), getTimestamp(), isAggressive());
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" + "id=" + id + ", side=" + side + ", price=" + price + ", quantity=" + quantity + ", timestamp=" + timestamp
+                + ", isAggressive=" + isAggressive + '}';
     }
 
     public abstract int getAvailableQuantity();
