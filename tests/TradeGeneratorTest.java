@@ -1,6 +1,4 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.util.stream.Stream;
 
@@ -14,10 +12,12 @@ public class TradeGeneratorTest {
     private static final int QUANTITY = 100;
     private static final int TIMESTAMP = 10;
 
+    private final TradeGenerator generator = new TradeGenerator();
+
     @ParameterizedTest
     @MethodSource("dataProvider")
     void generatePrediction(final Order aggressiveOrder, final Order passiveOrder, final TradePrediction expectedTrade) {
-        assertEquals(expectedTrade, TradeGenerator.generatePrediction(aggressiveOrder, passiveOrder));
+        assertEquals(expectedTrade, generator.generatePrediction(aggressiveOrder, passiveOrder));
     }
 
     private static Stream<Arguments> dataProvider() {
@@ -55,11 +55,11 @@ public class TradeGeneratorTest {
     }
 
     private static Order buildOrder(Side side, int price, int quantity, int timestamp) {
-        final Order order = mock(Order.class);
-        doReturn(Side.BUY.equals(side)).when(order).isBuyOrder();
-        doReturn(price).when(order).getPrice();
-        doReturn(quantity).when(order).getAvailableQuantity();
-        doReturn(timestamp).when(order).getTimestamp();
-        return order;
+        return LimitOrder.newBuilderInstance()
+                .withSide(side)
+                .withPrice(price)
+                .withQuantity(quantity)
+                .withTimestamp(timestamp)
+                .build();
     }
 }

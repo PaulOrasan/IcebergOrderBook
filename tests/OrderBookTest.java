@@ -1,7 +1,5 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,6 +19,10 @@ public class OrderBookTest {
     private static final int SELL_SIDE_BOUND = 100;
     private static final int ORDER_TIMESTAMP = 1000;
     private static final int TRADE_TIMESTAMP = 2000;
+    private static final Order AGGRESSIVE_ORDER = LimitOrder.newBuilderInstance()
+            .withId(INVALID_ID)
+            .withAggressiveStatus(true)
+            .build();
     private OrderBook orderBook;
     private static List<Order> WARM_UP_ORDERS;
 
@@ -169,17 +171,10 @@ public class OrderBookTest {
     }
 
     private static TradeEvent buildTradeEvent(final Order predictedOrder) {
-        final TradeEvent event = mock(TradeEvent.class);
-        final Order buySidePrediction = predictedOrder.isBuyOrder() ? predictedOrder : mock(LimitOrder.class);
-        final Order sellSidePrediction = !predictedOrder.isBuyOrder() ? predictedOrder : mock(LimitOrder.class);
-        if (predictedOrder.isBuyOrder()) {
-            doReturn(INVALID_ID).when(sellSidePrediction).getId();
-        } else {
-            doReturn(INVALID_ID).when(buySidePrediction).getId();
-        }
-        doReturn(new TradeResult(buySidePrediction)).when(event).getBuyTradeResult();
-        doReturn(new TradeResult(sellSidePrediction)).when(event).getSellTradeResult();
-        return event;
+        final Order buySidePrediction = predictedOrder.isBuyOrder() ? predictedOrder : AGGRESSIVE_ORDER;
+        final Order sellSidePrediction = !predictedOrder.isBuyOrder() ? predictedOrder : AGGRESSIVE_ORDER;
+        return new TradeEvent(buySidePrediction.getId(), sellSidePrediction.getId(), buySidePrediction.getPrice(), buySidePrediction.getQuantity(),
+                new TradeResult(buySidePrediction), new TradeResult(sellSidePrediction));
     }
 
     private static Order getExpectedBuyOrder(final List<Order> inputOrders) {

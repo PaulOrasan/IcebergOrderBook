@@ -5,9 +5,9 @@ public class TradeGenerator {
 
     private static final TradePrediction NO_TRADE = new TradePrediction(0, 0, 0);
 
-    private TradeGenerator() {}
+    public TradeGenerator() {}
 
-    public static TradePrediction generatePrediction(final Order aggressiveOrder, final Order passiveOrder) {
+    public TradePrediction generatePrediction(final Order aggressiveOrder, final Order passiveOrder) {
         final Order buySideOrder = aggressiveOrder.isBuyOrder() ? aggressiveOrder : passiveOrder;
         final Order sellSideOrder = aggressiveOrder.isBuyOrder() ? passiveOrder : aggressiveOrder;
         if (buySideOrder.getPrice() < sellSideOrder.getPrice()) {

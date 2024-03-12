@@ -16,6 +16,15 @@ public class TradeEvent {
         this.sellTradeResult = sellOrder.generatePotentialResult(tradePrediction);
     }
 
+    TradeEvent(int buyOrderId, int sellOrderId, int tradedPrice, int tradedQuantity, TradeResult buyTradeResult, TradeResult sellTradeResult) {
+        this.buyOrderId = buyOrderId;
+        this.sellOrderId = sellOrderId;
+        this.tradedPrice = tradedPrice;
+        this.tradedQuantity = tradedQuantity;
+        this.buyTradeResult = buyTradeResult;
+        this.sellTradeResult = sellTradeResult;
+    }
+
     public int getBuyOrderId() {
         return buyOrderId;
     }
