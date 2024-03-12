@@ -59,6 +59,7 @@ public class IcebergOrder extends Order{
             final Order predictedOrder = builderFromOrder(this)
                     .withAggressiveStatus(false)
                     .withCurrentPeakQuantity(min(getMaxPeakSize(), getAvailableQuantity()))
+                    .withQuantity(getQuantity() > getMaxPeakSize() ? getQuantity() - getMaxPeakSize() : 0)
                     .build();
             return new TradeResult(predictedOrder);
         }
@@ -161,7 +162,7 @@ public class IcebergOrder extends Order{
 
         public Builder withMaxPeakSize(int maxPeakSize) {
             this.maxPeakSize = maxPeakSize;
-            this.currentPeakQuantity = isAggressive ? 0 : min(quantity, maxPeakSize);
+            // this.currentPeakQuantity = isAggressive ? 0 : min(quantity, maxPeakSize);
             return getThis();
         }
 

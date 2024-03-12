@@ -7,6 +7,6 @@ public class TimeUtils {
     }
 
     public static long getCurrentTimestamp() {
-        return Instant.now().getEpochSecond();
+        return Instant.now().getNano();
     }
 }

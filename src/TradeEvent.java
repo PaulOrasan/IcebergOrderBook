@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class TradeEvent {
 
     private final int buyOrderId;
@@ -47,5 +49,40 @@ public class TradeEvent {
 
     public TradeResult getSellTradeResult() {
         return sellTradeResult;
+    }
+
+    public boolean canBeCollapsed(TradeEvent otherEvent) {
+        return getBuyOrderId() == otherEvent.getBuyOrderId() && getSellOrderId() == otherEvent.getSellOrderId() && getTradedPrice() == otherEvent.getTradedPrice();
+    }
+
+    public TradeEvent collapseEvents(TradeEvent otherEvent) {
+        if (canBeCollapsed(otherEvent)) {
+            return new TradeEvent(getBuyOrderId(), getSellOrderId(), getTradedPrice(), getTradedQuantity() + otherEvent.getTradedQuantity(), null, null);
+        }
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TradeEvent that = (TradeEvent) o;
+        return getBuyOrderId() == that.getBuyOrderId() && getSellOrderId() == that.getSellOrderId() && getTradedPrice() == that.getTradedPrice()
+                && getTradedQuantity() == that.getTradedQuantity();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBuyOrderId(), getSellOrderId(), getTradedPrice(), getTradedQuantity());
+    }
+
+    @Override
+    public String toString() {
+        return "TradeEvent{" + "buyOrderId=" + buyOrderId + ", sellOrderId=" + sellOrderId + ", tradedPrice=" + tradedPrice + ", tradedQuantity="
+                + tradedQuantity + '}';
     }
 }

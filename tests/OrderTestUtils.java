@@ -61,11 +61,11 @@ public class OrderTestUtils {
     }
 
     public static IcebergOrder generateIcebergOrder(Side side, int price, int timestamp) {
-        return generateIcebergOrder(ORDER_ID, side, price, ORIGINAL_QUANTITY, timestamp, false, MAX_PEAK_SIZE);
+        return generateIcebergOrder(timestamp, side, price, ORIGINAL_QUANTITY, timestamp, false, MAX_PEAK_SIZE);
     }
 
     public static IcebergOrder generateIcebergOrder(int timestamp) {
-        return generateIcebergOrder(ORDER_ID, Side.BUY, PRICE, ORIGINAL_QUANTITY, timestamp, false, MAX_PEAK_SIZE);
+        return generateIcebergOrder(timestamp, Side.BUY, PRICE, ORIGINAL_QUANTITY, timestamp, false, MAX_PEAK_SIZE);
     }
 
     public static IcebergOrder generateIcebergOrder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive,

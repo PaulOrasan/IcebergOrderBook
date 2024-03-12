@@ -1,4 +1,5 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,23 +11,20 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class ExecutionEngineIntegrationTest {
 
-
-    private static final int INVALID_ID = -1;
     private static final int NUMBER_OF_ORDERS = 1000;
     private static final int BUY_PRICE_BOUND = 90;
     private static final int AGGRESSIVE_PRICE = 95;
     private static final int SELL_PRICE_BOUND = 100;
     private static final int AGGRESSIVE_QUANTITY = 1000;
 
-    private static final int AGGRESSIVE_ORDER_ID = 2546;
     private static final int ORDER_TIMESTAMP = 1000;
-    private static final int TRADE_TIMESTAMP = 2000;
     private static final Random random = new Random();
     private static final LimitOrder LIMIT_ORDER = LimitOrder.newBuilderInstance()
             .withId(OrderTestUtils.ORDER_ID)
@@ -68,12 +66,41 @@ public class ExecutionEngineIntegrationTest {
         executionEngine = new ExecutionEngine(orderBook, tradeGenerator, tradePublisher);
     }
 
+    @Test
+    void addOrder_flowTest() {
+        final Order passiveOrder = limitOrder(400).apply(LIMIT_ORDER);
+        executionEngine.addOrder(passiveOrder);
+        assertEquals(0, tradePublisher.getTradeEvents().size());
+        executionEngine.addOrder(LIMIT_ORDER);
+        assertEquals(1, tradePublisher.getTradeEvents().size());
+
+        assertEquals(LIMIT_ORDER.getId(), orderBook.getTopBuyOrder().getId());
+        assertEquals(600, orderBook.getTopBuyOrder().getAvailableQuantity());
+
+        final Order aggressiveIcebergOrder = IcebergOrder.builderFromOrder(ICEBERG_ORDER)
+                .withSide(Side.SELL)
+                .build();
+
+        executionEngine.addOrder(aggressiveIcebergOrder);
+        System.out.println(orderBook.getTopSellOrder());
+        assertEquals(ICEBERG_ORDER.getId(), orderBook.getTopSellOrder().getId());
+        assertEquals(ICEBERG_ORDER.getMaxPeakSize(), orderBook.getTopSellOrder().getAvailableQuantity());
+        assertEquals(300, orderBook.getTopSellOrder().getQuantity());
+
+        final Order aggressiveLimitOrder = LimitOrder.builderFromOrder(LIMIT_ORDER)
+                .withQuantity(320)
+                .build();
+        executionEngine.addOrder(aggressiveLimitOrder);
+        assertEquals(ICEBERG_ORDER.getId(), orderBook.getTopSellOrder().getId());
+        assertEquals(80, orderBook.getTopSellOrder().getAvailableQuantity());
+        assertEquals(0, orderBook.getTopSellOrder().getQuantity());
+    }
+
 
     @ParameterizedTest
     @MethodSource("dataProvider")
     void addOrder(final Order aggressiveOrder, final List<Order> passiveOrders, final List<TradeEvent> expectedTradeEvents) {
         passiveOrders.forEach(orderBook::insertOrder);
-
         executionEngine.addOrder(aggressiveOrder);
 
         final List<TradeEvent> actualTradeEvents = tradePublisher.getTradeEvents();
@@ -88,16 +115,16 @@ public class ExecutionEngineIntegrationTest {
                 scenario(LIMIT_ORDER, icebergOrder(3000, 1500), expectedTrade(1000)),
                 scenario(LIMIT_ORDER, icebergOrder(2000, 1000), expectedTrade(1000)),
                 scenario(LIMIT_ORDER, icebergOrder(1000, 1000), expectedTrade(1000)),
-                scenario(LIMIT_ORDER, List.of(icebergOrder(1000, 250), icebergOrder(500, 250), limitOrder(100, 5)), expectedTrade(500), expectedTrade(500)),
+                scenario(LIMIT_ORDER, List.of(icebergOrder(1000, 250, 4), icebergOrder(500, 250, 4), limitOrder(100, 3)), expectedTrade(500), expectedTrade(500)),
                 scenario(LIMIT_ORDER, List.of(icebergOrder(1000, 250), limitOrder(500), icebergOrder(1000, 100)), expectedTrade(400), expectedTrade(500), expectedTrade(100)),
-                scenario(LIMIT_ORDER, limitOrder(2000, SELL_PRICE_BOUND - AGGRESSIVE_PRICE + 1)),
-
+                scenario(LIMIT_ORDER, limitOrder(2000, -2)),
+                //
                 scenario(ICEBERG_ORDER, limitOrder(2000), expectedTrade(1000)),
                 scenario(ICEBERG_ORDER, List.of(limitOrder(200), limitOrder(300), limitOrder(1000)), expectedTrade(200), expectedTrade(300), expectedTrade(500)),
-                scenario(ICEBERG_ORDER, List.of(icebergOrder(1500, 400), limitOrder(5)), expectedTrade(1000)),
-                scenario(ICEBERG_ORDER, List.of(icebergOrder(300, 100, 1), limitOrder(450, 1), icebergOrder(450, 150, 3)), expectedTrade(300), expectedTrade(400), expectedTrade(250)),
+                scenario(ICEBERG_ORDER, List.of(icebergOrder(1500, 400, 4), limitOrder(500, 3)), expectedTrade(1000)),
+                scenario(ICEBERG_ORDER, List.of(icebergOrder(300, 100, 2), limitOrder(450, 2), icebergOrder(450, 150, 1)), expectedTrade(300), expectedTrade(450), expectedTrade(250)),
                 scenario(ICEBERG_ORDER, List.of(icebergOrder(300, 100), limitOrder(300), icebergOrder(900, 150)), expectedTrade(300), expectedTrade(300), expectedTrade(400)),
-                scenario(ICEBERG_ORDER, limitOrder(2000, SELL_PRICE_BOUND - AGGRESSIVE_PRICE + 1))
+                scenario(ICEBERG_ORDER, limitOrder(2000, -2))
         );
     }
 
@@ -119,38 +146,6 @@ public class ExecutionEngineIntegrationTest {
             expectedTrades.add(trades[i].apply(aggressiveOrder, passiveOrders.get(i)));
         }
         return Arguments.of(aggressiveOrder, passiveOrders, expectedTrades);
-    }
-
-    private static LimitOrder generatePassiveLimitOrder(int price, int quantity) {
-        return LimitOrder.builderFromOrder(LIMIT_ORDER)
-                .withPrice(price)
-                .withQuantity(quantity)
-                .withAggressiveStatus(false)
-                .build();
-    }
-
-    public static Order getExpectedBuyOrder(final List<Order> inputOrders) {
-        return inputOrders.stream()
-                .filter(order -> Side.BUY.equals(order.getSide()))
-                .max((order1, order2) -> {
-                    if (order1.getPrice() == order2.getPrice()) {
-                        return -Long.compare(order1.getTimestamp(), order2.getTimestamp());
-                    }
-                    return Integer.compare(order1.getPrice(), order2.getPrice());
-                })
-                .orElseThrow();
-    }
-
-    public static Order getExpectedSellOrder(final List<Order> inputOrders) {
-        return inputOrders.stream()
-                .filter(order -> Side.SELL.equals(order.getSide()))
-                .max((order1, order2) -> {
-                    if (order1.getPrice() == order2.getPrice()) {
-                        return -Long.compare(order1.getTimestamp(), order2.getTimestamp());
-                    }
-                    return -Integer.compare(order1.getPrice(), order2.getPrice());
-                })
-                .orElseThrow();
     }
 
     private static Function<Order, Order> limitOrder(int quantity) {
@@ -177,9 +172,10 @@ public class ExecutionEngineIntegrationTest {
                 .withId(random.nextInt())
                 .withSide(order.isBuyOrder() ? Side.SELL : Side.BUY)
                 .withPrice(order.isBuyOrder() ? order.getPrice() - priceDifference : order.getPrice() + priceDifference)
-                .withQuantity(quantity)
+                .withQuantity(quantity - maxPeakSize)
                 .withAggressiveStatus(false)
                 .withMaxPeakSize(maxPeakSize)
+                .withCurrentPeakQuantity(maxPeakSize)
                 .withTimestamp(TimeUtils.getCurrentTimestamp())
                 .build();
     }

@@ -82,10 +82,11 @@ public class OrderBookTest {
                 .withId(OrderTestUtils.ORDER_ID)
                 .withSide(Side.BUY)
                 .withPrice(price)
-                .withQuantity(OrderTestUtils.ORIGINAL_QUANTITY)
+                .withQuantity(OrderTestUtils.ORIGINAL_QUANTITY - IcebergOrderTest.MAX_PEAK_SIZE)
                 .withTimestamp(ORDER_TIMESTAMP)
                 .withAggressiveStatus(false)
                 .withMaxPeakSize(IcebergOrderTest.MAX_PEAK_SIZE)
+                .withCurrentPeakQuantity(IcebergOrderTest.MAX_PEAK_SIZE)
                 .build();
         final IcebergOrder secondIcebergOrder = IcebergOrder.builderFromOrder(topIcebergOrder)
                 .withTimestamp((ORDER_TIMESTAMP + TRADE_TIMESTAMP) / 2)
