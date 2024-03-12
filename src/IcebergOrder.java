@@ -9,15 +9,15 @@ public class IcebergOrder extends Order{
     private final int maxPeakSize;
     private final int currentPeakQuantity;
 
-    public IcebergOrder(int id, Side side, int price, int quantity, int timestamp, int maxPeakSize) {
+    public IcebergOrder(int id, Side side, int price, int quantity, long timestamp, int maxPeakSize) {
         this(id, side, price, quantity, timestamp, true, maxPeakSize, 0);
     }
 
-    public IcebergOrder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive, int maxPeakSize) {
+    public IcebergOrder(int id, Side side, int price, int quantity, long timestamp, boolean isAggressive, int maxPeakSize) {
         this(id, side, price, quantity, timestamp, isAggressive, maxPeakSize, isAggressive ? 0 : min(quantity, maxPeakSize));
     }
 
-    private IcebergOrder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive, int maxPeakSize, int currentPeakQuantity) {
+    private IcebergOrder(int id, Side side, int price, int quantity, long timestamp, boolean isAggressive, int maxPeakSize, int currentPeakQuantity) {
         super(id, side, price, quantity, timestamp, isAggressive);
         this.maxPeakSize = maxPeakSize;
         this.currentPeakQuantity = currentPeakQuantity;

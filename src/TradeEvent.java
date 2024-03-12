@@ -10,12 +10,12 @@ public class TradeEvent {
     private final TradeResult sellTradeResult;
 
     public TradeEvent(final Order buyOrder, final Order sellOrder, final TradePrediction tradePrediction) {
-        this.buyOrderId = buyOrder.getId();
-        this.sellOrderId = sellOrder.getId();
+        this.buyOrderId = buyOrder != null ? buyOrder.getId() : 0;
+        this.sellOrderId = sellOrder != null ? sellOrder.getId() : 0;
         this.tradedPrice = tradePrediction.getPredictedPrice();
         this.tradedQuantity = tradePrediction.getPredictedQuantity();
-        this.buyTradeResult = buyOrder.generatePotentialResult(tradePrediction);
-        this.sellTradeResult = sellOrder.generatePotentialResult(tradePrediction);
+        this.buyTradeResult = buyOrder != null ? buyOrder.generatePotentialResult(tradePrediction) : null;
+        this.sellTradeResult = sellOrder != null ? sellOrder.generatePotentialResult(tradePrediction) : null;
     }
 
     TradeEvent(int buyOrderId, int sellOrderId, int tradedPrice, int tradedQuantity, TradeResult buyTradeResult, TradeResult sellTradeResult) {

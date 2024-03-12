@@ -28,6 +28,7 @@ public class TradeGeneratorTest {
                 scenario(aggressiveBuyOrder, buildSellOrder(PRICE - 10, QUANTITY, TIMESTAMP / 2), QUANTITY),
                 scenario(aggressiveBuyOrder, buildSellOrder(PRICE - 10, QUANTITY / 2, TIMESTAMP / 2), QUANTITY / 2),
                 scenario(aggressiveBuyOrder, buildSellOrder(PRICE - 10, QUANTITY * 2, TIMESTAMP / 2), QUANTITY),
+                scenarioNoTrade(aggressiveBuyOrder, null),
                 scenarioNoTrade(aggressiveSellOrder, buildBuyOrder(PRICE - 10, QUANTITY, TIMESTAMP)),
                 scenario(aggressiveSellOrder, buildBuyOrder(PRICE + 10, QUANTITY, TIMESTAMP / 2), QUANTITY),
                 scenario(aggressiveSellOrder, buildBuyOrder(PRICE + 10, QUANTITY / 2, TIMESTAMP / 2), QUANTITY / 2),

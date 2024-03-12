@@ -47,7 +47,7 @@ public class ExecutionEngineIntegrationTest {
 
     private OrderBook orderBook;
     private TradeGenerator tradeGenerator;
-    private TradePublisher tradePublisher;
+    private DataPublisher dataPublisher;
     private ExecutionEngine executionEngine;
     private static List<Order> WARM_UP_ORDERS;
 
@@ -62,17 +62,17 @@ public class ExecutionEngineIntegrationTest {
         orderBook = new OrderBook();
         WARM_UP_ORDERS.forEach(orderBook::insertOrder);
         tradeGenerator = new TradeGenerator();
-        tradePublisher = new TradePublisher();
-        executionEngine = new ExecutionEngine(orderBook, tradeGenerator, tradePublisher);
+        dataPublisher = new DataPublisher();
+        executionEngine = new ExecutionEngine(orderBook, tradeGenerator, dataPublisher);
     }
 
     @Test
     void addOrder_flowTest() {
         final Order passiveOrder = limitOrder(400).apply(LIMIT_ORDER);
         executionEngine.addOrder(passiveOrder);
-        assertEquals(0, tradePublisher.getTradeEvents().size());
+        assertEquals(0, dataPublisher.getTradeEvents().size());
         executionEngine.addOrder(LIMIT_ORDER);
-        assertEquals(1, tradePublisher.getTradeEvents().size());
+        assertEquals(1, dataPublisher.getTradeEvents().size());
 
         assertEquals(LIMIT_ORDER.getId(), orderBook.getTopBuyOrder().getId());
         assertEquals(600, orderBook.getTopBuyOrder().getAvailableQuantity());
@@ -103,7 +103,7 @@ public class ExecutionEngineIntegrationTest {
         passiveOrders.forEach(orderBook::insertOrder);
         executionEngine.addOrder(aggressiveOrder);
 
-        final List<TradeEvent> actualTradeEvents = tradePublisher.getTradeEvents();
+        final List<TradeEvent> actualTradeEvents = dataPublisher.getTradeEvents();
 
         assertEquals(expectedTradeEvents, actualTradeEvents);
     }

@@ -9,11 +9,11 @@ public abstract class Order {
     private final long timestamp;
     private final boolean isAggressive;
 
-    public Order(int id, Side side, int price, int quantity, int timestamp) {
+    public Order(int id, Side side, int price, int quantity, long timestamp) {
         this(id, side, price, quantity, timestamp, true);
     }
 
-    public Order(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive) {
+    public Order(int id, Side side, int price, int quantity, long timestamp, boolean isAggressive) {
         this.id = id;
         this.side = side;
         this.price = price;

@@ -5,12 +5,12 @@ public class ExecutionEngine {
 
     private final OrderBook orderBook;
     private final TradeGenerator generator;
-    private final TradePublisher tradePublisher;
+    private final DataPublisher dataPublisher;
 
-    public ExecutionEngine(OrderBook orderBook, TradeGenerator generator, TradePublisher tradePublisher) {
+    public ExecutionEngine(OrderBook orderBook, TradeGenerator generator, DataPublisher dataPublisher) {
         this.orderBook = orderBook;
         this.generator = generator;
-        this.tradePublisher = tradePublisher;
+        this.dataPublisher = dataPublisher;
     }
 
     public void addOrder(final Order order) {
@@ -51,7 +51,8 @@ public class ExecutionEngine {
         if (aggressiveOrder.getAvailableQuantity() > 0) {
             orderBook.insertOrder(aggressiveOrder);
         }
-        tradePublisher.publishTrades(collapseEvents(events));
+        dataPublisher.publishTrades(collapseEvents(events));
+        dataPublisher.publishOrderBook(orderBook.getBuyOrders(), orderBook.getSellOrders());
     }
 
     private TradeEvent buildEvent(Order aggressiveOrder, Order passiveOrder, TradePrediction prediction) {

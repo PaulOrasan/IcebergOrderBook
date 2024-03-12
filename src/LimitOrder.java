@@ -1,10 +1,10 @@
 public class LimitOrder extends Order{
 
-    public LimitOrder(int id, Side side, int price, int quantity, int timestamp) {
+    public LimitOrder(int id, Side side, int price, int quantity, long timestamp) {
         this(id, side, price, quantity, timestamp, true);
     }
 
-    public LimitOrder(int id, Side side, int price, int quantity, int timestamp, boolean isAggressive) {
+    public LimitOrder(int id, Side side, int price, int quantity, long timestamp, boolean isAggressive) {
         super(id, side, price, quantity, timestamp, isAggressive);
     }
 

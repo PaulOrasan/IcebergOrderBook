@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -19,11 +21,25 @@ public class OrderBook {
         return null;
     }
 
+    public List<Order> getBuyOrders() {
+        final List<Order> orders = new ArrayList<>();
+        buyOrders.descendingKeySet()
+                .forEach(price -> orders.addAll(buyOrders.get(price).getOrders()));
+        return orders;
+    }
+
     public Order getTopSellOrder() {
         if (!sellOrders.isEmpty()) {
             return sellOrders.firstEntry().getValue().getTopOrder();
         }
         return null;
+    }
+
+    public List<Order> getSellOrders() {
+        final List<Order> orders = new ArrayList<>();
+        sellOrders.keySet()
+                .forEach(price -> orders.addAll(sellOrders.get(price).getOrders()));
+        return orders;
     }
 
     public void insertOrder(final Order order) {

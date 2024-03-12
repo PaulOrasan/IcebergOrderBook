@@ -1,14 +1,19 @@
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class OrderBookPriceLevel {
 
     private final int price;
-    private final PriorityQueue<Order> orders;
+    private final TreeSet<Order> orders;
 
     public OrderBookPriceLevel(int price) {
         this.price = price;
-        this.orders = new PriorityQueue<>(Comparator.comparingLong(Order::getTimestamp));
+        this.orders = new TreeSet<>(Comparator.comparingLong(Order::getTimestamp));
     }
 
     public int getPrice() {
@@ -24,10 +29,14 @@ public class OrderBookPriceLevel {
     }
 
     public Order getTopOrder() {
-        return orders.peek();
+        return orders.first();
     }
 
     public void removeTopOrder() {
-        orders.poll();
+        orders.pollFirst();
+    }
+
+    public List<Order> getOrders() {
+        return new ArrayList<>(orders);
     }
 }
