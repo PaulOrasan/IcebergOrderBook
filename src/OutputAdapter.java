@@ -4,10 +4,6 @@ import java.text.NumberFormat;
 
 public class OutputAdapter {
 
-    private static final int ID_WIDTH = 10;
-    private static final int VOLUME_WIDTH = 13;
-    private static final int PRICE_WIDTH = 7;
-    private static final int TOTAL_WIDTH = ID_WIDTH + VOLUME_WIDTH + PRICE_WIDTH + 7; // Including formatting marks
     public static final String FULL_ROW_FORMAT = "|%-10s|%-13s|%-7s|%-7s|%-13s|%-10s|%n";
     public static final String FULL_ORDER_ROW_FORMAT = "|%10s|%13s|%7s|%7s|%13s|%10s|%n";
     private final BufferedWriter writer;

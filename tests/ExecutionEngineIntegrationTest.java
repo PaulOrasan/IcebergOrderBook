@@ -45,7 +45,6 @@ public class ExecutionEngineIntegrationTest {
 
 
     private OrderBook orderBook;
-    private TradeGenerator tradeGenerator;
     private DataPublisher dataPublisher;
     private ExecutionEngine executionEngine;
     private static List<Order> WARM_UP_ORDERS;
@@ -60,7 +59,7 @@ public class ExecutionEngineIntegrationTest {
     void setUp() {
         orderBook = new OrderBook();
         WARM_UP_ORDERS.forEach(orderBook::insertOrder);
-        tradeGenerator = new TradeGenerator();
+        TradeGenerator tradeGenerator = new TradeGenerator();
         dataPublisher = new DataPublisher();
         executionEngine = new ExecutionEngine(orderBook, tradeGenerator, dataPublisher);
     }

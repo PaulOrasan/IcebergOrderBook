@@ -8,7 +8,6 @@ public class OrderTestUtils {
     public static final int ORDER_ID = 12375;
     public static final int PRICE = 89;
     public static final int ORIGINAL_QUANTITY = 1000;
-    public static final int ORIGINAL_TIMESTAMP = 10000;
     private static final int MAX_PEAK_SIZE = 100;
 
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 public class OrderBookPriceLevelTest {
 
-    private OrderBookPriceLevel testPriceLevel = new OrderBookPriceLevel(OrderTestUtils.PRICE);
+    private final OrderBookPriceLevel testPriceLevel = new OrderBookPriceLevel(OrderTestUtils.PRICE);
 
 
     @Test

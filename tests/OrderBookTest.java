@@ -102,24 +102,24 @@ public class OrderBookTest {
 
         return Stream.of(
                 // BUY-SIDE
-                scenario(limitOrder, partialTrade(limitOrder), partialTrade(limitOrder), getExpectedSellOrder(WARM_UP_ORDERS))
-                // scenario(limitOrder, fullTrade(limitOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(topIcebergOrder, partialPeakTrade(topIcebergOrder), partialPeakTrade(topIcebergOrder), getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(topIcebergOrder, fullPeakTrade(topIcebergOrder), fullPeakTrade(topIcebergOrder), getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(topIcebergOrder, fullTrade(topIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(icebergOrders, partialPeakTrade(topIcebergOrder), partialPeakTrade(topIcebergOrder), getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(icebergOrders, fullPeakTrade(topIcebergOrder), secondIcebergOrder, getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(icebergOrders, fullTrade(topIcebergOrder), secondIcebergOrder, getExpectedSellOrder(WARM_UP_ORDERS)),
-                //
-                // // SELL-SIDE
-                // scenario(sellLimitOrder, partialTrade(sellLimitOrder), getExpectedBuyOrder(WARM_UP_ORDERS), partialTrade(sellLimitOrder)),
-                // scenario(sellLimitOrder, fullTrade(sellLimitOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(sellTopIcebergOrder, partialPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), partialPeakTrade(sellTopIcebergOrder)),
-                // scenario(sellTopIcebergOrder, fullPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), fullPeakTrade(sellTopIcebergOrder)),
-                // scenario(sellTopIcebergOrder, fullTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
-                // scenario(sellIcebergOrders, partialPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), partialPeakTrade(sellTopIcebergOrder)),
-                // scenario(sellIcebergOrders, fullPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), sellSecondIcebergOrder),
-                // scenario(sellIcebergOrders, fullTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), sellSecondIcebergOrder)
+                scenario(limitOrder, partialTrade(limitOrder), partialTrade(limitOrder), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(limitOrder, fullTrade(limitOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(topIcebergOrder, partialPeakTrade(topIcebergOrder), partialPeakTrade(topIcebergOrder), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(topIcebergOrder, fullPeakTrade(topIcebergOrder), fullPeakTrade(topIcebergOrder), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(topIcebergOrder, fullTrade(topIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(icebergOrders, partialPeakTrade(topIcebergOrder), partialPeakTrade(topIcebergOrder), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(icebergOrders, fullPeakTrade(topIcebergOrder), secondIcebergOrder, getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(icebergOrders, fullTrade(topIcebergOrder), secondIcebergOrder, getExpectedSellOrder(WARM_UP_ORDERS)),
+
+                // SELL-SIDE
+                scenario(sellLimitOrder, partialTrade(sellLimitOrder), getExpectedBuyOrder(WARM_UP_ORDERS), partialTrade(sellLimitOrder)),
+                scenario(sellLimitOrder, fullTrade(sellLimitOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(sellTopIcebergOrder, partialPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), partialPeakTrade(sellTopIcebergOrder)),
+                scenario(sellTopIcebergOrder, fullPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), fullPeakTrade(sellTopIcebergOrder)),
+                scenario(sellTopIcebergOrder, fullTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), getExpectedSellOrder(WARM_UP_ORDERS)),
+                scenario(sellIcebergOrders, partialPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), partialPeakTrade(sellTopIcebergOrder)),
+                scenario(sellIcebergOrders, fullPeakTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), sellSecondIcebergOrder),
+                scenario(sellIcebergOrders, fullTrade(sellTopIcebergOrder), getExpectedBuyOrder(WARM_UP_ORDERS), sellSecondIcebergOrder)
 
         );
     }
