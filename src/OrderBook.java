@@ -13,6 +13,11 @@ public class OrderBook {
         sellOrders = new TreeMap<>(Comparator.naturalOrder());
     }
 
+
+    /**
+     * Finds the highest priority buy order
+     * @return Order or null if no buy order exists
+     */
     public Order getTopBuyOrder() {
         if (!buyOrders.isEmpty()) {
             return buyOrders.firstEntry().getValue().getTopOrder();
@@ -20,6 +25,10 @@ public class OrderBook {
         return null;
     }
 
+    /**
+     * Finds all buy orders ordered according to their priority
+     * @return
+     */
     public List<Order> getBuyOrders() {
         final List<Order> orders = new ArrayList<>();
         buyOrders.descendingKeySet()
@@ -27,6 +36,10 @@ public class OrderBook {
         return orders;
     }
 
+    /**
+     * Finds the highest priority sell order
+     * @return Order or null if no sell order exists
+     */
     public Order getTopSellOrder() {
         if (!sellOrders.isEmpty()) {
             return sellOrders.firstEntry().getValue().getTopOrder();
@@ -41,6 +54,10 @@ public class OrderBook {
         return orders;
     }
 
+    /**
+     * Adds a new order into the OrderBook
+     * @param order - must be passive order, otherwise nothing happens
+     */
     public void insertOrder(final Order order) {
         insertOrder(order.isBuyOrder() ? buyOrders : sellOrders, order);
     }

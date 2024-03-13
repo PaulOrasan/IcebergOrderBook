@@ -162,7 +162,6 @@ public class IcebergOrder extends Order{
 
         public Builder withMaxPeakSize(int maxPeakSize) {
             this.maxPeakSize = maxPeakSize;
-            // this.currentPeakQuantity = isAggressive ? 0 : min(quantity, maxPeakSize);
             return getThis();
         }
 

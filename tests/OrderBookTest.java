@@ -178,7 +178,7 @@ public class OrderBookTest {
                 new TradeResult(buySidePrediction), new TradeResult(sellSidePrediction));
     }
 
-    public static Order getExpectedBuyOrder(final List<Order> inputOrders) {
+    private static Order getExpectedBuyOrder(final List<Order> inputOrders) {
         return inputOrders.stream()
                 .filter(order -> Side.BUY.equals(order.getSide()))
                 .max((order1, order2) -> {
@@ -190,7 +190,7 @@ public class OrderBookTest {
                 .orElseThrow();
     }
 
-    public static Order getExpectedSellOrder(final List<Order> inputOrders) {
+    private static Order getExpectedSellOrder(final List<Order> inputOrders) {
         return inputOrders.stream()
                 .filter(order -> Side.SELL.equals(order.getSide()))
                 .max((order1, order2) -> {

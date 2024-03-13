@@ -1,5 +1,3 @@
-import static java.lang.Math.max;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

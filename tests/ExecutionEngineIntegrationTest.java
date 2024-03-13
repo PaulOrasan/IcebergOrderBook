@@ -1,4 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,37 +66,6 @@ public class ExecutionEngineIntegrationTest {
         executionEngine = new ExecutionEngine(orderBook, tradeGenerator, dataPublisher);
     }
 
-    @Test
-    void addOrder_flowTest() {
-        final Order passiveOrder = limitOrder(400).apply(LIMIT_ORDER);
-        executionEngine.addOrder(passiveOrder);
-        assertEquals(0, dataPublisher.getTradeEvents().size());
-        executionEngine.addOrder(LIMIT_ORDER);
-        assertEquals(1, dataPublisher.getTradeEvents().size());
-
-        assertEquals(LIMIT_ORDER.getId(), orderBook.getTopBuyOrder().getId());
-        assertEquals(600, orderBook.getTopBuyOrder().getAvailableQuantity());
-
-        final Order aggressiveIcebergOrder = IcebergOrder.builderFromOrder(ICEBERG_ORDER)
-                .withSide(Side.SELL)
-                .build();
-
-        executionEngine.addOrder(aggressiveIcebergOrder);
-        System.out.println(orderBook.getTopSellOrder());
-        assertEquals(ICEBERG_ORDER.getId(), orderBook.getTopSellOrder().getId());
-        assertEquals(ICEBERG_ORDER.getMaxPeakSize(), orderBook.getTopSellOrder().getAvailableQuantity());
-        assertEquals(300, orderBook.getTopSellOrder().getQuantity());
-
-        final Order aggressiveLimitOrder = LimitOrder.builderFromOrder(LIMIT_ORDER)
-                .withQuantity(320)
-                .build();
-        executionEngine.addOrder(aggressiveLimitOrder);
-        assertEquals(ICEBERG_ORDER.getId(), orderBook.getTopSellOrder().getId());
-        assertEquals(80, orderBook.getTopSellOrder().getAvailableQuantity());
-        assertEquals(0, orderBook.getTopSellOrder().getQuantity());
-    }
-
-
     @ParameterizedTest
     @MethodSource("dataProvider")
     void addOrder(final Order aggressiveOrder, final List<Order> passiveOrders, final List<TradeEvent> expectedTradeEvents) {
@@ -104,6 +75,39 @@ public class ExecutionEngineIntegrationTest {
         final List<TradeEvent> actualTradeEvents = dataPublisher.getTradeEvents();
 
         assertEquals(expectedTradeEvents, actualTradeEvents);
+    }
+
+    @Test
+    void addOrder_flowTest() {
+        final Order passiveOrder = limitOrder(400).apply(LIMIT_ORDER);
+        final IcebergOrder aggressiveIcebergOrder = IcebergOrder.builderFromOrder(ICEBERG_ORDER)
+                .withSide(Side.SELL)
+                .build();
+        final LimitOrder aggressiveLimitOrder = LimitOrder.builderFromOrder(LIMIT_ORDER)
+                .withQuantity(320)
+                .build();
+
+        executionEngine.addOrder(passiveOrder);
+
+        assertTrue(dataPublisher.getTradeEvents().isEmpty());
+
+        executionEngine.addOrder(LIMIT_ORDER);
+
+        assertFalse(dataPublisher.getTradeEvents().isEmpty());
+        assertEquals(LIMIT_ORDER.getId(), orderBook.getTopBuyOrder().getId());
+        assertEquals(600, orderBook.getTopBuyOrder().getAvailableQuantity());
+
+        executionEngine.addOrder(aggressiveIcebergOrder);
+
+        assertEquals(aggressiveIcebergOrder.getId(), orderBook.getTopSellOrder().getId());
+        assertEquals(aggressiveIcebergOrder.getMaxPeakSize(), orderBook.getTopSellOrder().getAvailableQuantity());
+        assertEquals(300, orderBook.getTopSellOrder().getQuantity());
+
+        executionEngine.addOrder(aggressiveLimitOrder);
+
+        assertEquals(aggressiveIcebergOrder.getId(), orderBook.getTopSellOrder().getId());
+        assertEquals(80, orderBook.getTopSellOrder().getAvailableQuantity());
+        assertEquals(0, orderBook.getTopSellOrder().getQuantity());
     }
 
     private static Stream<Arguments> dataProvider() {

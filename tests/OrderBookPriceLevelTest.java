@@ -13,7 +13,7 @@ public class OrderBookPriceLevelTest {
 
     @Test
     void addOrder() {
-        final List<Order> orders = OrderTestUtils.generateOrdersSamePrice(10);
+        final List<Order> orders = OrderTestUtils.generateOrdersSamePrice(100);
         orders.forEach(testPriceLevel::addOrder);
         final List<Order> actualOrders = new ArrayList<>();
         while (!testPriceLevel.isEmpty()) {
