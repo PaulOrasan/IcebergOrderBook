@@ -63,13 +63,13 @@ public class OrderBook {
     }
 
     public void notifyTradeEvent(final TradeEvent event) {
-        if (getTopBuyOrder().getId() == event.getBuyTradeResult().getPredictedOrder().getId()) {
+        if (getTopBuyOrder() != null && getTopBuyOrder().getId() == event.getBuyTradeResult().getPredictedOrder().getId()) {
             removeTopOrder(buyOrders);
             if (event.getBuyTradeResult().getPredictedOrder().getAvailableQuantity() > 0) {
                 insertOrder(event.getBuyTradeResult().getPredictedOrder());
             }
         }
-        if (getTopSellOrder().getId() == event.getSellTradeResult().getPredictedOrder().getId()) {
+        if (getTopSellOrder() != null && getTopSellOrder().getId() == event.getSellTradeResult().getPredictedOrder().getId()) {
             removeTopOrder(sellOrders);
             if (event.getSellTradeResult().getPredictedOrder().getAvailableQuantity() > 0) {
                 insertOrder(event.getSellTradeResult().getPredictedOrder());

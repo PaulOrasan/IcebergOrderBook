@@ -49,18 +49,11 @@ public class ExecutionEngineIntegrationTest {
     private OrderBook orderBook;
     private DataPublisher dataPublisher;
     private ExecutionEngine executionEngine;
-    private static List<Order> WARM_UP_ORDERS;
 
-
-    @BeforeAll
-    static void generalSetUp() {
-        WARM_UP_ORDERS = OrderTestUtils.generateOrdersRandomPriceAndSide(NUMBER_OF_ORDERS, BUY_PRICE_BOUND, SELL_PRICE_BOUND);
-    }
 
     @BeforeEach
     void setUp() {
         orderBook = new OrderBook();
-        WARM_UP_ORDERS.forEach(orderBook::insertOrder);
         TradeGenerator tradeGenerator = new TradeGenerator();
         dataPublisher = new DataPublisher();
         executionEngine = new ExecutionEngine(orderBook, tradeGenerator, dataPublisher);

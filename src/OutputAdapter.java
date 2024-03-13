@@ -9,6 +9,8 @@ public class OutputAdapter {
     private static final String HORIZONTAL_BORDER = "+-----------------------------------------------------------------+\n";
     private static final String HEADER_BOTTOM_BORDER = "+----------+-------------+-------+-------+-------------+----------+\n";
     private static final String HEADER_TOP_ROW_FORMAT = "|%-32s|%-32s|%n";
+    private static final String DEFAULT_VALUE = "";
+    private static final String TRADE_FORMAT = "%d,%d,%d,%d\n";
     private final BufferedWriter writer;
 
     public OutputAdapter(BufferedWriter writer) {
@@ -62,26 +64,26 @@ public class OutputAdapter {
     }
 
     private String convertTradeToString(final TradeEvent event) {
-        return String.format("%d,%d,%d,%d\n", event.getBuyOrderId(), event.getSellOrderId(), event.getTradedPrice(), event.getTradedQuantity());
+        return String.format(TRADE_FORMAT, event.getBuyOrderId(), event.getSellOrderId(), event.getTradedPrice(), event.getTradedQuantity());
     }
 
     private String convertId(final Order order) {
         if (order == null) {
-            return "";
+            return DEFAULT_VALUE;
         }
         return String.valueOf(order.getId());
     }
 
     private String convertVolume(final Order order) {
         if (order == null) {
-            return "";
+            return DEFAULT_VALUE;
         }
         return NumberFormat.getInstance().format(order.getAvailableQuantity());
     }
 
     private String convertPrice(final Order order) {
         if (order == null) {
-            return "";
+            return DEFAULT_VALUE;
         }
         return NumberFormat.getInstance().format(order.getPrice());
     }
