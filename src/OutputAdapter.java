@@ -4,8 +4,11 @@ import java.text.NumberFormat;
 
 public class OutputAdapter {
 
-    public static final String FULL_ROW_FORMAT = "|%-10s|%-13s|%-7s|%-7s|%-13s|%-10s|%n";
-    public static final String FULL_ORDER_ROW_FORMAT = "|%10s|%13s|%7s|%7s|%13s|%10s|%n";
+    private static final String HEADER_BOTTOM_ROW_FORMAT = "|%-10s|%-13s|%-7s|%-7s|%-13s|%-10s|%n";
+    private static final String FULL_ORDER_ROW_FORMAT = "|%10s|%13s|%7s|%7s|%13s|%10s|%n";
+    private static final String HORIZONTAL_BORDER = "+-----------------------------------------------------------------+\n";
+    private static final String HEADER_BOTTOM_BORDER = "+----------+-------------+-------+-------+-------------+----------+\n";
+    private static final String HEADER_TOP_ROW_FORMAT = "|%-32s|%-32s|%n";
     private final BufferedWriter writer;
 
     public OutputAdapter(BufferedWriter writer) {
@@ -23,12 +26,11 @@ public class OutputAdapter {
 
 
     public void displayOrderBookHeader() {
-        // Display headers
         try {
-            writer.write("+-----------------------------------------------------------------+\n");
-            writer.write(String.format("|%-32s|%-32s|%n", " BUY", " SELL"));
-            writer.write(String.format(FULL_ROW_FORMAT, " Id", " Volume", " Price", " Price", " Volume", " Id"));
-            writer.write("+----------+-------------+-------+-------+-------------+----------+\n");
+            writer.write(HORIZONTAL_BORDER);
+            writer.write(String.format(HEADER_TOP_ROW_FORMAT, " BUY", " SELL"));
+            writer.write(String.format(HEADER_BOTTOM_ROW_FORMAT, " Id", " Volume", " Price", " Price", " Volume", " Id"));
+            writer.write(HEADER_BOTTOM_BORDER);
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -37,28 +39,22 @@ public class OutputAdapter {
 
     public void displayOrderPair(final Order buyOrder, final Order sellOrder) {
         try {
-            final NumberFormat formatter = NumberFormat.getInstance();
-            if (buyOrder != null && sellOrder != null) {
-                writer.write(
-                        String.format(FULL_ORDER_ROW_FORMAT, buyOrder.getId(), formatter.format(buyOrder.getAvailableQuantity()), formatter.format(buyOrder.getPrice()),
-                                formatter.format(sellOrder.getPrice()), formatter.format(sellOrder.getAvailableQuantity()), sellOrder.getId()
-                        ));
-            }
-            if (buyOrder == null && sellOrder != null) {
-                writer.write(String.format(FULL_ORDER_ROW_FORMAT, "", "", "", formatter.format(sellOrder.getPrice()), formatter.format(sellOrder.getAvailableQuantity()), sellOrder.getId()));
-            }
-            if (buyOrder != null && sellOrder == null) {
-                writer.write(String.format(FULL_ORDER_ROW_FORMAT, buyOrder.getId(), formatter.format(buyOrder.getAvailableQuantity()), formatter.format(buyOrder.getPrice()), "", "", ""));
-            }
+            writer.write(convertOrderPair(buyOrder, sellOrder));
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private String convertOrderPair(Order buyOrder, Order sellOrder) {
+        return String.format(FULL_ORDER_ROW_FORMAT, convertId(buyOrder), convertVolume(buyOrder), convertPrice(buyOrder), convertPrice(sellOrder),
+                convertVolume(sellOrder), convertId(sellOrder)
+        );
+    }
+
     public void displayFinalOrderBook() {
         try {
-            writer.write("+-----------------------------------------------------------------+\n");
+            writer.write(HORIZONTAL_BORDER);
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -67,5 +63,26 @@ public class OutputAdapter {
 
     private String convertTradeToString(final TradeEvent event) {
         return String.format("%d,%d,%d,%d\n", event.getBuyOrderId(), event.getSellOrderId(), event.getTradedPrice(), event.getTradedQuantity());
+    }
+
+    private String convertId(final Order order) {
+        if (order == null) {
+            return "";
+        }
+        return String.valueOf(order.getId());
+    }
+
+    private String convertVolume(final Order order) {
+        if (order == null) {
+            return "";
+        }
+        return NumberFormat.getInstance().format(order.getAvailableQuantity());
+    }
+
+    private String convertPrice(final Order order) {
+        if (order == null) {
+            return "";
+        }
+        return NumberFormat.getInstance().format(order.getPrice());
     }
 }

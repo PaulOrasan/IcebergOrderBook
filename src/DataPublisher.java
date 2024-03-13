@@ -27,8 +27,11 @@ public class DataPublisher {
     public void publishOrderBook(List<Order> buyOrders, List<Order> sellOrders) {
         if (adapter != null) {
             adapter.displayOrderBookHeader();
-            for (int i = 0; i < max(buyOrders.size(), sellOrders.size()); i++) {
-                adapter.displayOrderPair(i < buyOrders.size() ? buyOrders.get(i) : null, i < sellOrders.size() ? sellOrders.get(i) : null);
+            int maxOrdersSize = Math.max(buyOrders.size(), sellOrders.size());
+            for (int i = 0; i < maxOrdersSize; i++) {
+                Order buyOrder = i < buyOrders.size() ? buyOrders.get(i) : null;
+                Order sellOrder = i < sellOrders.size() ? sellOrders.get(i) : null;
+                adapter.displayOrderPair(buyOrder, sellOrder);
             }
             adapter.displayFinalOrderBook();
         }

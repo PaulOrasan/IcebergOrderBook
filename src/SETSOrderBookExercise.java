@@ -12,7 +12,7 @@ public class SETSOrderBookExercise {
 
         final InputAdapter adapter = new InputAdapter(new BufferedReader(new InputStreamReader(System.in)));
         final OutputAdapter outputAdapter = new OutputAdapter(new BufferedWriter(new OutputStreamWriter(System.out)));
-        // outputAdapter.displayOrderBookHeader();
+
         final OrderBook orderBook = new OrderBook();
         final TradeGenerator generator = new TradeGenerator();
         final DataPublisher publisher = new DataPublisher(outputAdapter);

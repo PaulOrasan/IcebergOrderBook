@@ -70,6 +70,9 @@ public class OrderBook {
     }
 
     private void insertOrder(final TreeMap<Integer, OrderBookPriceLevel> orders, final Order orderToBeInserted) {
+        if (orderToBeInserted.getAvailableQuantity() == 0) {
+            return;
+        }
         if (!orders.containsKey(orderToBeInserted.getPrice())) {
             orders.put(orderToBeInserted.getPrice(), new OrderBookPriceLevel(orderToBeInserted.getPrice()));
         }

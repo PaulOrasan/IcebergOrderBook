@@ -14,45 +14,31 @@ public class ExecutionEngine {
     }
 
     public void addOrder(final Order order) {
-        // Order aggressiveOrder = order;
-        // Order passiveOrder = getOppositeSideCandidateOrder(aggressiveOrder);
-        // TradePrediction prediction = generator.generatePrediction(aggressiveOrder, passiveOrder);
-        // List<TradeEvent> events = new ArrayList<>();
-        // while (prediction.isTradeMatch()) {
-        //     final TradeEvent event = new TradeEvent(aggressiveOrder.isBuyOrder() ? aggressiveOrder : passiveOrder,
-        //             aggressiveOrder.isBuyOrder() ? passiveOrder : aggressiveOrder, prediction);
-        //     events.add(event);
-        //     orderBook.notifyTradeEvent(event);
-        //     final Order buySideOrder = event.getBuyTradeResult().getPredictedOrder();
-        //     final Order sellSideOrder = event.getSellTradeResult().getPredictedOrder();
-        //     aggressiveOrder = buySideOrder.isAggressive() ? buySideOrder : sellSideOrder;
-        //     passiveOrder = getOppositeSideCandidateOrder(aggressiveOrder);
-        //     prediction = generator.generatePrediction(aggressiveOrder, passiveOrder);
-        // }
-        // if (aggressiveOrder.getAvailableQuantity() > 0) {
-        //     orderBook.insertOrder(aggressiveOrder);
-        // }
-        // tradePublisher.publishTrades(collapseEvents(events));
-
-        Order aggressiveOrder = order;
-        final List<TradeEvent> events = new ArrayList<>();
-        while (true) {
-            Order passiveOrder = getOppositeSideCandidateOrder(aggressiveOrder);
-            TradePrediction prediction = generator.generatePrediction(aggressiveOrder, passiveOrder);
-            final TradeEvent event = buildEvent(aggressiveOrder, passiveOrder, prediction);
-            aggressiveOrder = getOrderFromEvent(event, aggressiveOrder.getSide());
-            if (prediction.isTradeMatch()) {
-                orderBook.notifyTradeEvent(event);
-                events.add(event);
-            } else {
-                break;
-            }
-        }
-        if (aggressiveOrder.getAvailableQuantity() > 0) {
-            orderBook.insertOrder(aggressiveOrder);
-        }
+        final List<TradeEvent> events = handleTrade(order);
         dataPublisher.publishTrades(collapseEvents(events));
         dataPublisher.publishOrderBook(orderBook.getBuyOrders(), orderBook.getSellOrders());
+    }
+
+    private List<TradeEvent> handleTrade(final Order aggressiveOrder) {
+        Order order = aggressiveOrder;
+        final List<TradeEvent> events = new ArrayList<>();
+        do {
+            TradeEvent event = attemptTradeMatch(order);
+            events.add(event);
+            order = getOrderFromEvent(event, order.getSide());
+        } while (order.isAggressive());
+        orderBook.insertOrder(order);
+        return events;
+    }
+
+    private TradeEvent attemptTradeMatch(Order aggressiveOrder) {
+        Order passiveOrder = getOppositeSidePassiveOrder(aggressiveOrder);
+        TradePrediction prediction = generator.generatePrediction(aggressiveOrder, passiveOrder);
+        final TradeEvent event = buildEvent(aggressiveOrder, passiveOrder, prediction);
+        if (prediction.isTradeMatch()) {
+            orderBook.notifyTradeEvent(event);
+        }
+        return event;
     }
 
     private TradeEvent buildEvent(Order aggressiveOrder, Order passiveOrder, TradePrediction prediction) {
@@ -65,25 +51,30 @@ public class ExecutionEngine {
         return Side.BUY.equals(targetSide) ? event.getBuyTradeResult().getPredictedOrder() : event.getSellTradeResult().getPredictedOrder();
     }
 
-    private Order getPassiveOrderFromEvent(final TradeEvent event) {
-        return !event.getBuyTradeResult().getPredictedOrder().isAggressive()
-                ? event.getBuyTradeResult().getPredictedOrder()
-                : event.getSellTradeResult().getPredictedOrder();
-    }
-
-    private List<TradeEvent> collapseEvents(List<TradeEvent> rawEvents) {
+    private List<TradeEvent> collapseEvents(final List<TradeEvent> rawEvents) {
         final List<TradeEvent> collapsedEvents = new ArrayList<>();
         for (var event: rawEvents) {
-            if (!collapsedEvents.stream().anyMatch(e -> e.canBeCollapsed(event))) {
-                collapsedEvents.add(rawEvents.stream()
-                                .filter(ev -> ev != event)
-                        .reduce(event, TradeEvent::collapseEvents));
+            if (event.getTradedQuantity() == 0) {
+                continue;
+            }
+            if (!isEventCollapsible(event, collapsedEvents)) {
+                collapsedEvents.add(collapseEvent(event, rawEvents));
             }
         }
         return collapsedEvents;
     }
 
-    private Order getOppositeSideCandidateOrder(final Order order) {
+    private boolean isEventCollapsible(final TradeEvent event, final  List<TradeEvent> collapsedEvents) {
+        return collapsedEvents.stream().anyMatch(e -> e.canBeCollapsed(event));
+    }
+
+    private TradeEvent collapseEvent(final TradeEvent targetEvent, final List<TradeEvent> rawEvents) {
+        return rawEvents.stream()
+                .filter(event -> targetEvent != event)
+                .reduce(targetEvent, TradeEvent::collapseEvents);
+    }
+
+    private Order getOppositeSidePassiveOrder(final Order order) {
         if (Side.BUY.equals(order.getSide())) {
             return orderBook.getTopSellOrder();
         }
