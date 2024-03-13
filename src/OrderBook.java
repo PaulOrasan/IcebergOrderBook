@@ -30,10 +30,7 @@ public class OrderBook {
      * @return
      */
     public List<Order> getBuyOrders() {
-        final List<Order> orders = new ArrayList<>();
-        buyOrders.descendingKeySet()
-                .forEach(price -> orders.addAll(buyOrders.get(price).getOrders()));
-        return orders;
+        return getOrders(buyOrders);
     }
 
     /**
@@ -48,10 +45,7 @@ public class OrderBook {
     }
 
     public List<Order> getSellOrders() {
-        final List<Order> orders = new ArrayList<>();
-        sellOrders.keySet()
-                .forEach(price -> orders.addAll(sellOrders.get(price).getOrders()));
-        return orders;
+        return getOrders(sellOrders);
     }
 
     /**
@@ -94,5 +88,12 @@ public class OrderBook {
             orders.put(orderToBeInserted.getPrice(), new OrderBookPriceLevel(orderToBeInserted.getPrice()));
         }
         orders.get(orderToBeInserted.getPrice()).addOrder(orderToBeInserted);
+    }
+
+    private List<Order> getOrders(final TreeMap<Integer, OrderBookPriceLevel> orders) {
+        final List<Order> sortedOrders = new ArrayList<>();
+        orders.keySet()
+                .forEach(price -> sortedOrders.addAll(orders.get(price).getOrders()));
+        return sortedOrders;
     }
 }

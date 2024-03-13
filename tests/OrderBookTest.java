@@ -2,6 +2,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -52,6 +53,16 @@ public class OrderBookTest {
     @Test
     void getTopSellOrder_emptyValue() {
         assertNull(new OrderBook().getTopSellOrder());
+    }
+
+    @Test
+    void getBuyOrders() {
+        assertEquals(getSortedOrders(WARM_UP_ORDERS, Side.BUY), orderBook.getBuyOrders());
+    }
+
+    @Test
+    void getSellOrders() {
+        assertEquals(getSortedOrders(WARM_UP_ORDERS, Side.SELL), orderBook.getSellOrders());
     }
 
     @ParameterizedTest
@@ -178,27 +189,24 @@ public class OrderBookTest {
                 new TradeResult(buySidePrediction), new TradeResult(sellSidePrediction));
     }
 
-    private static Order getExpectedBuyOrder(final List<Order> inputOrders) {
+    private static List<Order> getSortedOrders(final List<Order> inputOrders, final Side targetSide) {
+        final int orderFactor = Side.BUY.equals(targetSide) ? -1 : 1;
         return inputOrders.stream()
-                .filter(order -> Side.BUY.equals(order.getSide()))
-                .max((order1, order2) -> {
+                .filter(order -> targetSide.equals(order.getSide()))
+                .sorted((order1, order2) -> {
                     if (order1.getPrice() == order2.getPrice()) {
-                        return -Long.compare(order1.getTimestamp(), order2.getTimestamp());
+                        return Long.compare(order1.getTimestamp(), order2.getTimestamp());
                     }
-                    return Integer.compare(order1.getPrice(), order2.getPrice());
+                    return orderFactor * Integer.compare(order1.getPrice(), order2.getPrice());
                 })
-                .orElseThrow();
+                .collect(Collectors.toList());
+    }
+
+    private static Order getExpectedBuyOrder(final List<Order> inputOrders) {
+        return getSortedOrders(inputOrders, Side.BUY).get(0);
     }
 
     private static Order getExpectedSellOrder(final List<Order> inputOrders) {
-        return inputOrders.stream()
-                .filter(order -> Side.SELL.equals(order.getSide()))
-                .max((order1, order2) -> {
-                    if (order1.getPrice() == order2.getPrice()) {
-                        return -Long.compare(order1.getTimestamp(), order2.getTimestamp());
-                    }
-                    return -Integer.compare(order1.getPrice(), order2.getPrice());
-                })
-                .orElseThrow();
+        return getSortedOrders(inputOrders, Side.SELL).get(0);
     }
 }
