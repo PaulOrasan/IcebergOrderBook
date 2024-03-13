@@ -22,7 +22,7 @@ public class OutputAdapter {
             writer.write(convertTradeToString(tradeEvent));
             writer.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Unexpected IO error");
         }
     }
 
@@ -35,7 +35,7 @@ public class OutputAdapter {
             writer.write(HEADER_BOTTOM_BORDER);
             writer.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Unexpected IO error");
         }
     }
 
@@ -44,7 +44,7 @@ public class OutputAdapter {
             writer.write(convertOrderPair(buyOrder, sellOrder));
             writer.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Unexpected IO error");
         }
     }
 

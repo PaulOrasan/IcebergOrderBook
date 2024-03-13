@@ -37,7 +37,7 @@ public class ExecutionEngineIntegrationTest {
             .build();
     private static final IcebergOrder ICEBERG_ORDER = IcebergOrder.newBuilderInstance()
             .withId(OrderTestUtils.ORDER_ID)
-            .withSide(Side.BUY)
+            .withSide(Side.SELL)
             .withPrice(AGGRESSIVE_PRICE)
             .withQuantity(AGGRESSIVE_QUANTITY)
             .withTimestamp(ORDER_TIMESTAMP)
@@ -73,9 +73,6 @@ public class ExecutionEngineIntegrationTest {
     @Test
     void addOrder_flowTest() {
         final Order passiveOrder = limitOrder(400).apply(LIMIT_ORDER);
-        final IcebergOrder aggressiveIcebergOrder = IcebergOrder.builderFromOrder(ICEBERG_ORDER)
-                .withSide(Side.SELL)
-                .build();
         final LimitOrder aggressiveLimitOrder = LimitOrder.builderFromOrder(LIMIT_ORDER)
                 .withQuantity(320)
                 .build();
@@ -90,15 +87,15 @@ public class ExecutionEngineIntegrationTest {
         assertEquals(LIMIT_ORDER.getId(), orderBook.getTopBuyOrder().getId());
         assertEquals(600, orderBook.getTopBuyOrder().getAvailableQuantity());
 
-        executionEngine.addOrder(aggressiveIcebergOrder);
+        executionEngine.addOrder(ICEBERG_ORDER);
 
-        assertEquals(aggressiveIcebergOrder.getId(), orderBook.getTopSellOrder().getId());
-        assertEquals(aggressiveIcebergOrder.getMaxPeakSize(), orderBook.getTopSellOrder().getAvailableQuantity());
+        assertEquals(ICEBERG_ORDER.getId(), orderBook.getTopSellOrder().getId());
+        assertEquals(ICEBERG_ORDER.getMaxPeakSize(), orderBook.getTopSellOrder().getAvailableQuantity());
         assertEquals(300, orderBook.getTopSellOrder().getQuantity());
 
         executionEngine.addOrder(aggressiveLimitOrder);
 
-        assertEquals(aggressiveIcebergOrder.getId(), orderBook.getTopSellOrder().getId());
+        assertEquals(ICEBERG_ORDER.getId(), orderBook.getTopSellOrder().getId());
         assertEquals(80, orderBook.getTopSellOrder().getAvailableQuantity());
         assertEquals(0, orderBook.getTopSellOrder().getQuantity());
     }
@@ -113,7 +110,7 @@ public class ExecutionEngineIntegrationTest {
                 scenario(LIMIT_ORDER, List.of(icebergOrder(1000, 250, 4), icebergOrder(500, 250, 4), limitOrder(100, 3)), expectedTrade(500), expectedTrade(500)),
                 scenario(LIMIT_ORDER, List.of(icebergOrder(1000, 250), limitOrder(500), icebergOrder(1000, 100)), expectedTrade(400), expectedTrade(500), expectedTrade(100)),
                 scenario(LIMIT_ORDER, limitOrder(2000, -2)),
-                //
+
                 scenario(ICEBERG_ORDER, limitOrder(2000), expectedTrade(1000)),
                 scenario(ICEBERG_ORDER, List.of(limitOrder(200), limitOrder(300), limitOrder(1000)), expectedTrade(200), expectedTrade(300), expectedTrade(500)),
                 scenario(ICEBERG_ORDER, List.of(icebergOrder(1500, 400, 4), limitOrder(500, 3)), expectedTrade(1000)),
